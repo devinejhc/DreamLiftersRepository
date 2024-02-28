@@ -10,7 +10,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% DELTA V1 
+%% DELTA V1 (Launch from Earth to parking orbit)
 
 % Earth Parameters
 earthRotSpeed = 7.292 * 10^(-5);          % Earth's Rotational Speed [rad/s]
@@ -26,9 +26,21 @@ deltaVLoss = 1.7;                         % DeltaV_Loss [km/s]
 latKSC = 28.524;                          % Latitude of GSC [deg]
 launchAz = 90;                            % Azimuth angle [deg]
 
-% Calculations
+% Calculations (Launch to LEO)
 VEH_KSC = earthRotSpeed * earthAvgRadius * cosd(latKSC) * sind(launchAz);
 velOrbit = sqrt((earthGravConst) ./ orbitRadius);
 deltaVLEO = velOrbit - 0;
 
+% Total DeltaV for this scenario
 deltaV1 = deltaVLoss - VEH_KSC + deltaVLEO;
+
+
+%% DELTA V2 (Plane change of parking orbit to match moon’s orbital plane)
+
+% Plane Change Parameters
+
+
+% Use the V_PC Formula
+deltaV2 = 2 * velOrbit * sind(incDiff / 2);
+
+
