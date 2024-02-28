@@ -18,8 +18,8 @@ earthAvgRadius = 6371;                    % Earth's Average Radius [km]
 earthGravConst = 3.986 * 10^5;            % Earth's GM Constant [km^3 / s^2]
 
 % Orbit Parameters
-altRange = 800;                           % Parking orbit altitude range [km]
-orbitRadius = earthAvgRadius + altRange;  % Radius of orbit [km]
+alt = 800;                                % Parking orbit altitude range [km]
+orbitRadius = earthAvgRadius + alt;       % Radius of orbit [km]
 deltaVLoss = 1.7;                         % DeltaV_Loss [km/s]
 
 % Launch Parameters
@@ -38,9 +38,12 @@ deltaV1 = deltaVLoss - VEH_KSC + deltaVLEO;
 %% DELTA V2 (Plane change of parking orbit to match moon’s orbital plane)
 
 % Plane Change Parameters
-
+earthInc = 23.5;                % Earth's Inclination [deg]
+initInc = latKSC - earthInc;    % Initial Orbit Inclination [deg]
+finalInc = 5.14;                % Moon's Orbit Relative Inclination [deg]
+incDiff = finalInc - initInc;   % Inclination Difference
 
 % Use the V_PC Formula
-deltaV2 = 2 * velOrbit * sind(incDiff / 2);
+deltaV2 = 2 * velOrbit * sind(abs(incDiff) / 2);
 
 
