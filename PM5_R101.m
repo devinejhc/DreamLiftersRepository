@@ -127,6 +127,9 @@ r_p = a_2 * (1 - e_2);
 % Calculate periapsis speed [km/s]
 v_p = sqrt(2 * (specEnergy_2 + (moonGravConst / r_p)));
 
+% Calculate deltaV3
+deltaV3 = injVel - velOrbit;
+
 
 %% DELTA V4 (Orbital injection burn to enter lunar orbit)
 
@@ -136,6 +139,10 @@ moonGravConst = 4902.8;
 perilune = 90;
 lunarOrbitRadius = perilune + moonAvgRadius;
 lunarOrbitVelocity = sqrt(moonGravConst / lunarOrbitRadius);
+
+% Calculate deltaV4
+moonOrbitVel = sqrt(moonGravConst / r_p);
+deltaV4 = v_2 - moonOrbitVel;
 
 
 %% DELTA V5 (Optional lowering of lunar orbit)
