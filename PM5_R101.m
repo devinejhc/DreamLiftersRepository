@@ -3,14 +3,17 @@
 %
 % Assignment Information
 %   Assignment:     PM5
-%   Authors:        Deepesh Balwani, dbalwani@purdue.edu, Jacob Devine, devine38@purdue.edu
+%   Authors:        Deepesh Balwani, dbalwani@purdue.edu
+%                   Jacob Devine, devine38@purdue.edu
 %   Team:           R101
 %
 %   Program Title: Delta V Calculations
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 clear
 clc
+
 %% DELTA V1 (Launch from Earth to parking orbit)
 
 % Earth Parameters
@@ -19,14 +22,11 @@ earthAvgRadius = 6371;                    % Earth's Average Radius [km]
 earthGravConst = 3.986 * 10^5;            % Earth's GM Constant [km^3 / s^2]
 
 % Orbit Parameters
-<<<<<<< HEAD
 alt = 275;                                % Parking orbit altitude range [km]
 orbitRadius = earthAvgRadius + alt;       % Radius of orbit [km]
-=======
-%parking orbit should probably go down- can go down as far as 200km perigee
-alt = 800;                                % Parking orbit altitude range [km]
-earthOrbitRadius = earthAvgRadius + alt;       % Radius of orbit [km]
->>>>>>> db71c693ac80dfa00ef46f01b96dd154c0b97347
+
+% parking orbit should probably go down- can go down as far as 200km perigee
+
 deltaVLoss = 1.7;                         % DeltaV_Loss [km/s]
 
 % Launch Parameters
@@ -35,11 +35,7 @@ launchAz = 90;                            % Azimuth angle [deg]
 
 % Calculations (Launch to LEO)
 VEH_KSC = earthRotSpeed * earthAvgRadius * cosd(latKSC) * sind(launchAz);
-<<<<<<< HEAD
 velOrbit = sqrt((earthGravConst) / orbitRadius);
-=======
-velOrbit = sqrt((earthGravConst) ./ earthOrbitRadius);
->>>>>>> db71c693ac80dfa00ef46f01b96dd154c0b97347
 deltaVLEO = velOrbit - 0;
 
 % Total DeltaV for this scenario
@@ -59,7 +55,9 @@ deltaV2 = 2 * velOrbit * sind(abs(incDiff) / 2);
 
 
 %% DELTA V3 (TLI burn to raise apogee to reach moon)
+
 orbitRadius = 6700;
+
 % Planetary Parameters
 distCOM = 384400;               % Distance between the COMs of the Moon and Earth [km]
 moonMass = 7.34767309 * 10^22;  % Mass of the moon [kg]
@@ -130,9 +128,6 @@ r_p = a_2 * (1 - e_2);
 v_p = sqrt(2 * (specEnergy_2 + (moonGravConst / r_p)));
 
 
-
-%% DELTA V3 (TLI burn, raising apogee to reach the Moon)
-
 %% DELTA V4 (Orbital injection burn to enter lunar orbit)
 
 % Historically, PFS-2 was able to enter a lunar orbit as low as 90km x 130 km and still maintained a stable orbit for 34 days despite the effects of lunar mascons. We will assume a 90 km circular orbit is stable enough for our purposes
@@ -141,11 +136,15 @@ moonGravConst = 4902.8;
 perilune = 90;
 lunarOrbitRadius = perilune + moonAvgRadius;
 lunarOrbitVelocity = sqrt(moonGravConst / lunarOrbitRadius);
+
+
 %% DELTA V5 (Optional lowering of lunar orbit)
 
 % We will insert directly into our target orbit to minimize dV losses; thus this step is not necessary
 % Consider using this option if we end up using a low-thrust transfer stage
 deltaV5 = 0;
+
+
 %% DELTA V6 (Landing delta v estimate)
 % Landing spot is at avg radius
 seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
