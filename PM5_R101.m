@@ -147,10 +147,33 @@ deltaV5 = 0;
 
 %% DELTA V6 (Landing delta v estimate)
 % Landing spot is at avg radius
-seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
-maxAltLandingSemiMajor = lunarOrbitRadius + moonAvgRadius + 10.786;
-seaLevelLandingVelocity = sqrt(moonGravConst * ((2 / moonAvgRadius) - (1/seaLevelLandingSemiMajor)));
-maxAltLandingLandingVelocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + 10.786)) - (1/maxAltLandingSemiMajor)));
 
+% Phase 1 of landing
+Phase1SemiMajor = 2 * moonAvgRadius + perilune + .1;
+Phase1Velocity = sqrt(moonGravConst * ((2 / (lunarOrbitRadius)) - (1 / Phase1SemiMajor)));
+Phase1DeltaV = abs(lunarOrbitVelocity - Phase1Velocity);
+
+% Phase 2 of landing
+
+Phase2Velocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + .1)) - (1 / Phase1SemiMajor)));
+Phase2DeltaV = Phase2Velocity - 2;
+
+% Phase 3 of landing
+
+DescentEngineIsp = 311;
+g0 = 9.81;
+drymass = 2000;
+wetmass = 2500;
+% moonGravity = 1.635;
+% consumptionAtMax = 3.71;
+% maxthrust = 47;
+Phase3DeltaV = DescentEngineIsp * g0 * log(wetmass/drymass);
+
+deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
+%all old code for differences across landing spot altitudes
+% seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
+% maxAltLandingSemiMajor = lunarOrbitRadius + moonAvgRadius + 10.786;
+% seaLevelLandingVelocity = sqrt(moonGravConst * ((2 / moonAvgRadius) - (1/seaLevelLandingSemiMajor)));
+% maxAltLandingLandingVelocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + 10.786)) - (1/maxAltLandingSemiMajor)));
 
 
