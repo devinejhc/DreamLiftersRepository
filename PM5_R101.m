@@ -5,6 +5,7 @@
 %   Assignment:     PM5
 %   Authors:        Deepesh Balwani, dbalwani@purdue.edu
 %                   Jacob Devine, devine38@purdue.edu
+%                   Stefano Vitello, svitello@purdue.edu
 %   Team:           R101
 %
 %   Program Title: Delta V Calculations
@@ -24,9 +25,6 @@ earthGravConst = 3.986 * 10^5;            % Earth's GM Constant [km^3 / s^2]
 % Orbit Parameters
 alt = 275;                                % Parking orbit altitude range [km]
 orbitRadius = earthAvgRadius + alt;       % Radius of orbit [km]
-
-% parking orbit should probably go down- can go down as far as 200km perigee
-
 deltaVLoss = 1.7;                         % DeltaV_Loss [km/s]
 
 % Launch Parameters
@@ -51,12 +49,10 @@ finalInc = 5.14;                % Moon's Orbit Relative Inclination [deg]
 incDiff = finalInc - initInc;   % Inclination Difference [deg]
 
 % Use the V_PC Formula
-deltaV2 = 2 * velOrbit * sind(abs(incDiff) / 2);   
+deltaV2 = 2 * velOrbit * sind(abs(incDiff) / 2);  
 
 
 %% DELTA V3 (TLI burn to raise apogee to reach moon)
-
-orbitRadius = 6700;
 
 % Planetary Parameters
 distCOM = 384400;               % Distance between the COMs of the Moon and Earth [km]
@@ -70,7 +66,7 @@ injAngl = 0;             % Injection angle at perigee [deg]
 injVel = 10.88;                 % Injection velocity [km/s]
 
 % TLI Orbit Parameters
-lambda = 60;              % Arrival angle to the moon [deg]
+lambda = 33.5;              % Arrival angle to the moon [deg]
 
 % Calculate Sphere of Influence for the moon [km]
 radiusInf = distCOM * ((moonMass / earthMass)^(2/5));
@@ -82,7 +78,7 @@ radiusToInf = sqrt(distCOM^2 + radiusInf^2 - 2*distCOM*radiusInf*cosd(lambda));
 initSpecEnergy = (injVel^2 / 2) - (earthGravConst / orbitRadius);
 
 % Calculate initial angular momentum [km^2 / s]
-h_0 = orbitRadius .* injVel .* cosd(injAngl); 
+h_0 = orbitRadius .* injVel .* cosd(injAngl);
 
 % Calculate semi-major axis (a) [km]
 a = (-1 * earthGravConst) / (2 * initSpecEnergy);
@@ -136,28 +132,52 @@ deltaV3 = injVel - velOrbit;
 % Historically, PFS-2 was able to enter a lunar orbit as low as 90km x 130 km and still maintained a stable orbit for 34 days despite the effects of lunar mascons. We will assume a 90 km circular orbit is stable enough for our purposes
 moonAvgRadius = 1737.5;
 moonGravConst = 4902.8;
-perilune = 90;
+perilune = r_p;
 lunarOrbitRadius = perilune + moonAvgRadius;
 lunarOrbitVelocity = sqrt(moonGravConst / lunarOrbitRadius);
 
 % Calculate deltaV4
 moonOrbitVel = sqrt(moonGravConst / r_p);
-deltaV4 = v_2 - moonOrbitVel;
+deltaV4 = v_p - moonOrbitVel;
 
 
 %% DELTA V5 (Optional lowering of lunar orbit)
 
-% We will insert directly into our target orbit to minimize dV losses; thus this step is not necessary
+% We will insert directly into our target orbit to minimize dV losses thus periapsis change is not needed
 % Consider using this option if we end up using a low-thrust transfer stage
-deltaV5 = 0;
+r_p_new = r_p; %New desired perilune radius
+deltaV5 = moonOrbitVel - sqrt(2 * moonGravConst / r_p - moonGravConst / ((r_p + r_p_new) / 2)); %Vis Viva for new orbit subtracted from current velocity
 
 
 %% DELTA V6 (Landing delta v estimate)
+
 % Landing spot is at avg radius
-seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
-maxAltLandingSemiMajor = lunarOrbitRadius + moonAvgRadius + 10.786;
-seaLevelLandingVelocity = sqrt(moonGravConst * ((2 / moonAvgRadius) - (1/seaLevelLandingSemiMajor)));
-maxAltLandingLandingVelocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + 10.786)) - (1/maxAltLandingSemiMajor)));
+% Phase 1 of landing
+Phase1SemiMajor = 2 * moonAvgRadius + perilune + .1;
+Phase1Velocity = sqrt(moonGravConst * ((2 / (lunarOrbitRadius)) - (1 / Phase1SemiMajor)));
+Phase1DeltaV = abs(lunarOrbitVelocity - Phase1Velocity);
+
+% Phase 2 of landing
+Phase2Velocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + .1)) - (1 / Phase1SemiMajor)));
+Phase2DeltaV = Phase2Velocity - 2;
+
+% Phase 3 of landing
+DescentEngineIsp = 311;
+g0 = 9.81;
+drymass = 2000;
+wetmass = 2500;
+% moonGravity = 1.635;
+% consumptionAtMax = 3.71;
+% maxthrust = 47;
+Phase3DeltaV = DescentEngineIsp * g0 * log(wetmass/drymass);
+deltaV6 = (Phase1DeltaV + Phase2DeltaV + Phase3DeltaV) / 1000;
+%all old code for differences across landing spot altitudes
+% seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
+% maxAltLandingSemiMajor = lunarOrbitRadius + moonAvgRadius + 10.786;
+% seaLevelLandingVelocity = sqrt(moonGravConst * ((2 / moonAvgRadius) - (1/seaLevelLandingSemiMajor)));
+% maxAltLandingLandingVelocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + 10.786)) - (1/maxAltLandingSemiMajor)));
 
 
+%% TOTAL DELTAV
 
+totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
