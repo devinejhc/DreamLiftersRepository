@@ -163,16 +163,13 @@ Phase2Velocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + .1)) - (1 / Phase1S
 Phase2DeltaV = Phase2Velocity - 2;
 
 % Phase 3 of landing
-DescentEngineIsp = 311;
-g0 = 9.81;
-drymass = 2000;
-wetmass = 2500;
-% moonGravity = 1.635;
-% consumptionAtMax = 3.71;
-% maxthrust = 47;
-Phase3DeltaV = DescentEngineIsp * g0 * log(wetmass/drymass);
-deltaV6 = (Phase1DeltaV + Phase2DeltaV + Phase3DeltaV) / 1000;
 
+g0 = 9.81;
+g = 9.81/6;
+burntime = 60;
+Phase3DeltaV = burntime * g / 1000;
+
+deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
 %all old code for differences across landing spot altitudes
 % seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
 % maxAltLandingSemiMajor = lunarOrbitRadius + moonAvgRadius + 10.786;
