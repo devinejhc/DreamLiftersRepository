@@ -154,13 +154,16 @@ deltaV5 = moonOrbitVel - sqrt(2 * moonGravConst / r_p - moonGravConst / ((r_p + 
 % Landing spot is at avg radius
 
 % Phase 1 of landing
-Phase1SemiMajor = 2 * moonAvgRadius + perilune + .1;
-Phase1Velocity = sqrt(moonGravConst * ((2 / (lunarOrbitRadius)) - (1 / Phase1SemiMajor)));
-Phase1DeltaV = abs(lunarOrbitVelocity - Phase1Velocity);
+Phase1Apolune = perilune;
+Phase1Perilune = moonAvgRadius;
+Phase1SemiMajor = (Phase1Perilune + Phase1Apolune)/2;
+Phase1FinalVelocity = sqrt(moonGravConst * ((2/Phase1Apolune) - (1/Phase1SemiMajor)));
+Phase1DeltaV = moonOrbitVel - Phase1FinalVelocity;
 
 % Phase 2 of landing
-Phase2Velocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + .1)) - (1 / Phase1SemiMajor)));
-Phase2DeltaV = Phase2Velocity - 2;
+Phase2Velocity = sqrt(moonGravConst * ((2/(Phase1Perilune + .100)) - (1/Phase1SemiMajor)));
+Phase2FinalVelocity = .002;
+Phase2DeltaV = abs(Phase2FinalVelocity - Phase2Velocity);
 
 % Phase 3 of landing
 
