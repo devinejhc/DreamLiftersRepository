@@ -43,13 +43,16 @@ deltaV1 = deltaVLoss - VEH_KSC + deltaVLEO;
 %% DELTA V2 (Plane change of parking orbit to match the Moon's orbital plane)
 
 % Plane Change Parameters
-earthInc = latKSC;              % Earth's Inclination [deg]
-initInc = latKSC - earthInc;    % Initial Orbit Inclination [deg]
-finalInc = 5.14;                % Moon's Orbit Relative Inclination [deg]
-incDiff = finalInc - initInc;   % Inclination Difference [deg]
+%earthInc = latKSC;              % Earth's Inclination [deg]
+%initInc = latKSC - earthInc;    % Initial Orbit Inclination [deg]
+%finalInc = 5.14;                % Moon's Orbit Relative Inclination [deg]
+%incDiff = finalInc - initInc;   % Inclination Difference [deg]
 
 % Use the V_PC Formula
-deltaV2 = 2 * velOrbit * sind(abs(incDiff) / 2);  
+%deltaV2 = 2 * velOrbit * sind(abs(incDiff) / 2);  
+
+% Due to no inclination change
+deltaV2 = 0;
 
 
 %% DELTA V3 (TLI burn to raise apogee to reach moon)
