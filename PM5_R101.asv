@@ -53,7 +53,7 @@ distCOM = 384400;               % Distance between the COMs of the Moon and Eart
 moonMass = 7.34767309 * 10^22;  % Mass of the moon [kg]
 earthMass = 5.97219 * 10^24;    % Mass of the Earth [kg]
 moonVel = 1.023;                % Velocity of the moon relative to Earth [km/s]
-moonGravConst = 4.90 * 10^3;    % Gravitational constant of the moon [km^3 / s^2]
+moonGravConst = 4.902 * 10^3;    % Gravitational constant of the moon [km^3 / s^2]
 
 % Before TLI Orbit Parameters
 injAngl = 0;             % Injection angle at perigee [deg]
@@ -100,31 +100,36 @@ v_2 = sqrt(arrSpeed^2 + moonVel^2 - 2*arrSpeed*moonVel*cosd(phi_1-arrPhaseAngl))
 
 % Calculate alpha and beta of the arrival vector triangle
 alpha = acosd((arrSpeed^2 + v_2^2 - moonVel^2) / (2*arrSpeed*v_2));
-
 beta = 180 - alpha - phi_1 + arrPhaseAngl;
+
 % Calculate flight path angle (phi_2) [deg]
 phi_2 = 180 - (lambda + beta);
+
 % Calculate arrival trajectory
 specEnergy_2 = (v_2^2 / 2) - (moonGravConst / radiusInf);
 h_2 = radiusInf * v_2 * cosd(phi_2);
 a_2 = (-1 * moonGravConst) / (2 * specEnergy_2);
 e_2 = sqrt(1 - (h_2^2)/(moonGravConst*a_2));
+
 % Calculate periselenium radius [km]
 r_p = a_2 * (1 - e_2);
+
 % Calculate periapsis speed [km/s]
 v_p = sqrt(2 * (specEnergy_2 + (moonGravConst / r_p)));
+
 % Calculate deltaV3
 deltaV3 = injVel - velOrbit;
 %% DELTA V4 (Orbital injection burn to enter lunar orbit)
 % Historically, PFS-2 was able to enter a lunar orbit as low as 90km x 130 km and still maintained a stable orbit for 34 days despite the effects of lunar mascons. We will assume a 90 km circular orbit is stable enough for our purposes
 moonAvgRadius = 1737.5;
-moonGravConst = 4902.8;
+
 perilune = r_p;
-lunarOrbitRadius = perilune + moonAvgRadius;
-lunarOrbitVelocity = sqrt(moonGravConst / lunarOrbitRadius);
+lunarOrbitVelocity = sqrt(moonGravConst / perilune);
+
 % Calculate deltaV4
 moonOrbitVel = sqrt(moonGravConst / r_p);
 deltaV4 = v_p - moonOrbitVel;
+
 %% DELTA V5 (Optional lowering of lunar orbit)
 % We will insert directly into our target orbit to minimize dV losses thus periapsis change is not needed
 % Consider using this option if we end up using a low-thrust transfer stage
@@ -138,21 +143,19 @@ Phase1Perilune = moonAvgRadius;
 Phase1SemiMajor = (Phase1Perilune + Phase1Apolune)/2;
 Phase1FinalVelocity = sqrt(moonGravConst * ((2/Phase1Apolune) - (1/Phase1SemiMajor)));
 Phase1DeltaV = moonOrbitVel - Phase1FinalVelocity;
+
 % Phase 2 of landing
 Phase2Velocity = sqrt(moonGravConst * ((2/(Phase1Perilune + .100)) - (1/Phase1SemiMajor)));
 Phase2FinalVelocity = .002;
 Phase2DeltaV = abs(Phase2FinalVelocity - Phase2Velocity);
+
 % Phase 3 of landing
 g0 = 9.81;
 g = 9.81/6;
 burntime = 60;
 Phase3DeltaV = burntime * g / 1000;
 deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
-%all old code for differences across landing spot altitudes
-% seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
-% maxAltLandingSemiMajor = lunarOrbitRadius + moonAvgRadius + 10.786;
-% seaLevelLandingVelocity = sqrt(moonGravConst * ((2 / moonAvgRadius) - (1/seaLevelLandingSemiMajor)));
-% maxAltLandingLandingVelocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + 10.786)) - (1/maxAltLandingSemiMajor)));
+
 %% TOTAL DELTAV
 totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %% Mass Estimation %% —----------------------------------------------------------------------------

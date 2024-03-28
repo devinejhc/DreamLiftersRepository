@@ -53,7 +53,7 @@ distCOM = 384400;               % Distance between the COMs of the Moon and Eart
 moonMass = 7.34767309 * 10^22;  % Mass of the moon [kg]
 earthMass = 5.97219 * 10^24;    % Mass of the Earth [kg]
 moonVel = 1.023;                % Velocity of the moon relative to Earth [km/s]
-moonGravConst = 4.90 * 10^3;    % Gravitational constant of the moon [km^3 / s^2]
+moonGravConst = 4.902 * 10^3;    % Gravitational constant of the moon [km^3 / s^2]
 
 % Before TLI Orbit Parameters
 injAngl = 0;             % Injection angle at perigee [deg]
@@ -121,11 +121,7 @@ v_p = sqrt(2 * (specEnergy_2 + (moonGravConst / r_p)));
 deltaV3 = injVel - velOrbit;
 %% DELTA V4 (Orbital injection burn to enter lunar orbit)
 % Historically, PFS-2 was able to enter a lunar orbit as low as 90km x 130 km and still maintained a stable orbit for 34 days despite the effects of lunar mascons. We will assume a 90 km circular orbit is stable enough for our purposes
-moonAvgRadius = 1737.5;
-moonGravConst = 4902.8;
-perilune = r_p;
-lunarOrbitRadius = perilune + moonAvgRadius;
-lunarOrbitVelocity = sqrt(moonGravConst / lunarOrbitRadius);
+lunarOrbitVelocity = sqrt(moonGravConst / r_p);
 
 % Calculate deltaV4
 moonOrbitVel = sqrt(moonGravConst / r_p);
@@ -138,8 +134,9 @@ r_p_new = r_p; %New desired perilune radius
 deltaV5 = moonOrbitVel - sqrt(2 * moonGravConst / r_p - moonGravConst / ((r_p + r_p_new) / 2)); %Vis Viva for new orbit subtracted from current velocity
 %% DELTA V6 (Landing delta v estimate)
 % Landing spot is at avg radius
+moonAvgRadius = 1737.5;
 % Phase 1 of landing
-Phase1Apolune = perilune;
+Phase1Apolune = r_p;
 Phase1Perilune = moonAvgRadius;
 Phase1SemiMajor = (Phase1Perilune + Phase1Apolune)/2;
 Phase1FinalVelocity = sqrt(moonGravConst * ((2/Phase1Apolune) - (1/Phase1SemiMajor)));
@@ -157,17 +154,12 @@ burntime = 60;
 Phase3DeltaV = burntime * g / 1000;
 deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
 
-%all old code for differences across landing spot altitudes
-% seaLevelLandingSemiMajor = lunarOrbitRadius + moonAvgRadius;
-% maxAltLandingSemiMajor = lunarOrbitRadius + moonAvgRadius + 10.786;
-% seaLevelLandingVelocity = sqrt(moonGravConst * ((2 / moonAvgRadius) - (1/seaLevelLandingSemiMajor)));
-% maxAltLandingLandingVelocity = sqrt(moonGravConst * ((2 / (moonAvgRadius + 10.786)) - (1/maxAltLandingSemiMajor)));
 %% TOTAL DELTAV
 totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %% Mass Estimation %% —----------------------------------------------------------------------------
 %Current ISP and finert values represent nothing, left is last stage, right is launch
-Isp = [360 360 360 290 290 290]; %Specific Impulse, add more per stage/different ISP
-finert = [.17 .17 .17 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
+Isp = [360 360 360 360 360 360]; %Specific Impulse, add more per stage/different ISP
+finert = [.1 .1 .1 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
 minitial = 1000; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
 dv = [deltaV6 deltaV5 deltaV4 deltaV3 deltaV2 deltaV1] * 1000; %Places delta V's into form more usable for loops
 %Loop generating mass estimates
