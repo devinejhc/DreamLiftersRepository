@@ -160,7 +160,8 @@ totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %Current ISP and finert values represent nothing, left is last stage, right is launch
 Isp = [311 319 319 465.5 360 360]; %Specific Impulse, add more per stage/different ISP
 finert = [.16 .16 .16 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
-minitial = 1000; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
+%this is ideal format- hydrolox in LEO (RL10) to AJ10 for lunar orbit to LMDE for descent (will be needed for throttle capability). Alternatively if we're willing to try and deal with hydrolox cooling in lunar orbit we can replace all orbital engines with RL10.
+minitial = 1500; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
 dv = [deltaV6 deltaV5 deltaV4 deltaV3 deltaV2 deltaV1] * 1000; %Places delta V's into form more usable for loops
 %Loop generating mass estimates
 for I = 1:1:6 %I runs to max number of burns/stages
