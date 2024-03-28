@@ -158,8 +158,8 @@ deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
 totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %% Mass Estimation %% —----------------------------------------------------------------------------
 %Current ISP and finert values represent nothing, left is last stage, right is launch
-Isp = [360 360 360 360 360 360]; %Specific Impulse, add more per stage/different ISP
-finert = [.1 .1 .1 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
+Isp = [311 319 319 465.5 360 360]; %Specific Impulse, add more per stage/different ISP
+finert = [.16 .16 .16 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
 minitial = 1000; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
 dv = [deltaV6 deltaV5 deltaV4 deltaV3 deltaV2 deltaV1] * 1000; %Places delta V's into form more usable for loops
 %Loop generating mass estimates
