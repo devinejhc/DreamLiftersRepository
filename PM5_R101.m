@@ -169,3 +169,15 @@ for I = 1:1:6 %I runs to max number of burns/stages
    minert(I) = finert(I)/(1-finert(I)) * mprop(I); %Estimates inert mass
    minitial(I+1) =  minert(I) + minitial(I) + mprop(I); %Adds the mass initial of this stage as the payload of the next
 end
+%% Launch vehicle allowed LEO mass
+%Working backwards from GSO
+geostationaryRadius = 42164;
+geostationaryVelocity = sqrt(earthGravConst/geostationaryRadius);
+%GTO
+perigeeAltitude = 200; %this is based on ESA typical perigee altitude
+GTOSemiMajorAxis = (perigeeAltitude + geostationaryRadius + earthAvgRadius) / 2;
+GTOApogeeVelocity = sqrt(earthGravConst * (2/geostationaryRadius) - (1/GTOSemiMajorAxis));
+%Plane Change
+GTOPlaneChange = 2 * GTOApogeeVelocity * sind(27/2);
+%Delta V from GTO to GSO
+deltaVdifference = GTOPlaneChange + (geostationaryVelocity - GTOApogeeVelocity);
