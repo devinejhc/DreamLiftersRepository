@@ -161,23 +161,22 @@ totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 Isp = [311 319 319 465.5 360 360]; %Specific Impulse, add more per stage/different ISP
 finert = [.16 .16 .16 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
 %this is ideal format- hydrolox in LEO (RL10) to AJ10 for lunar orbit to LMDE for descent (will be needed for throttle capability). Alternatively if we're willing to try and deal with hydrolox cooling in lunar orbit we can replace all orbital engines with RL10.
-minitial = 1500; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
+minitial(1:5) = [1000]; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
 dv = [deltaV6 deltaV5 deltaV4 deltaV3 deltaV2 deltaV1] * 1000; %Places delta V's into form more usable for loops
-%Loop generating mass estimates
-for I = 1:1:6 %I runs to max number of burns/stages
-   mprop(I) = minitial(I) * (exp(dv(I)/(Isp(I) * g0)) - 1) * (1 - finert(I)) / (1-finert(I) * exp(dv(I)/(Isp(I) * g0))); %Estimates propellant mass
-   minert(I) = finert(I)/(1-finert(I)) * mprop(I); %Estimates inert mass
-   minitial(I+1) =  minert(I) + minitial(I) + mprop(I); %Adds the mass initial of this stage as the payload of the next
+LVmaxpay = 27200; %Launch Vehicle max payload (kg)
+whilecond = 0;
+
+while whilecond ~= 1
+    %Loop generating mass estimates
+    if minitial(5) < LVmaxpay %Checks LEO payload mass is less than LV max mass to LEO
+        minitial(1) = minitial(1) + 1; %Adds 1kg to the final payload
+    else
+        whilecond = 1; %Loop conditional is now satisfied
+        minitial(1) = minitial(1) - 1; %Subtracts 1kg to the final payload
+    end
+    for I = 1:1:6 %I runs to max number of burns/stages
+        mprop(I) = minitial(I) * (exp(dv(I)/(Isp(I) * g0)) - 1) * (1 - finert(I)) / (1-finert(I) * exp(dv(I)/(Isp(I) * g0))); %Estimates propellant mass
+        minert(I) = finert(I)/(1-finert(I)) * mprop(I); %Estimates inert mass
+        minitial(I+1) =  minert(I) + minitial(I) + mprop(I); %Adds the mass initial of this stage as the payload of the next
+    end
 end
-%% Launch vehicle allowed LEO mass
-%Working backwards from GSO
-geostationaryRadius = 42164;
-geostationaryVelocity = sqrt(earthGravConst/geostationaryRadius);
-%GTO
-perigeeAltitude = 200; %this is based on ESA typical perigee altitude
-GTOSemiMajorAxis = (perigeeAltitude + geostationaryRadius + earthAvgRadius) / 2;
-GTOApogeeVelocity = sqrt(earthGravConst * (2/geostationaryRadius) - (1/GTOSemiMajorAxis));
-%Plane Change
-GTOPlaneChange = 2 * GTOApogeeVelocity * sind(27/2);
-%Delta V from GTO to GSO
-deltaVdifference = GTOPlaneChange + (geostationaryVelocity - GTOApogeeVelocity);
