@@ -158,7 +158,7 @@ deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
 totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %% Mass Estimation %% —----------------------------------------------------------------------------
 %Current ISP and finert values represent nothing, left is last stage, right is launch
-Isp = [311 319 319 465.5 360 360]; %Specific Impulse, add more per stage/different ISP
+Isp = [311 319 319 465.5 465.5 360]; %Specific Impulse, add more per stage/different ISP
 finert = [.16 .16 .16 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
 %this is ideal format- hydrolox in LEO (RL10) to AJ10 for lunar orbit to LMDE for descent (will be needed for throttle capability). Alternatively if we're willing to try and deal with hydrolox cooling in lunar orbit we can replace all orbital engines with RL10.
 minitial(1:5) = [1000]; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
@@ -180,7 +180,7 @@ while whilecond ~= 1
         minitial(I+1) =  minert(I) + minitial(I) + mprop(I); %Adds the mass initial of this stage as the payload of the next
     end
 end
-%% Launch vehicle allowed LEO mass
+%% Launch vehicle allowed GTO mass
 %Working backwards from GSO
 geostationaryRadius = 42164;
 geostationaryVelocity = sqrt(earthGravConst/geostationaryRadius);
