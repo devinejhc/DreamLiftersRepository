@@ -158,9 +158,10 @@ deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
 totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %% Mass Estimation %% —----------------------------------------------------------------------------
 %Current ISP and finert values represent nothing, left is last stage, right is launch
-Isp = [311 319 319 465.5 465.5 360]; %Specific Impulse, add more per stage/different ISP
-finert = [.16 .16 .16 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
-%this is ideal format- hydrolox in LEO (RL10) to AJ10 for lunar orbit to LMDE for descent (will be needed for throttle capability). Alternatively if we're willing to try and deal with hydrolox cooling in lunar orbit we can replace all orbital engines with RL10.
+Isp = [315.5 315.5 315.5 465.5 453.8 360]; %Specific Impulse, add more per stage/different ISP
+finert = [.23 .23 .23 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
+%RD843 hydrazine for landing and capture, RL10 for kick, Vulcan Centaur for launch and LEO
+%Landing and capture stages based on lengthened AVUM, kick stage based on lengthened Centaur
 minitial(1:5) = [1000]; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
 dv = [deltaV6 deltaV5 deltaV4 deltaV3 deltaV2 deltaV1] * 1000; %Places delta V's into form more usable for loops
 LVmaxpay = 27200; %Launch Vehicle max payload (kg)
@@ -179,6 +180,7 @@ while whilecond ~= 1
         minert(I) = finert(I)/(1-finert(I)) * mprop(I); %Estimates inert mass
         minitial(I+1) =  minert(I) + minitial(I) + mprop(I); %Adds the mass initial of this stage as the payload of the next
     end
+    
 end
 %% Launch vehicle allowed GTO mass
 %Working backwards from GSO
