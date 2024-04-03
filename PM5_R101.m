@@ -13,12 +13,25 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear
 clc
-%% DELTA V1 (Launch from Earth to parking orbit)
+%% BASE PARAMETERS
 % Earth Parameters
 
 earthRotSpeed = 7.292 * 10^(-5);          % Earth's Rotational Speed [rad/s]
 earthAvgRadius = 6371;                    % Earth's Average Radius [km]
 earthGravConst = 3.986 * 10^5;            % Earth's GM Constant [km^3 / s^2]
+g0 = 9.81;                                % Earth's Gravity [m/s^2]
+
+% Moon Parameters
+
+distCOM = 384400;               % Distance between the COMs of the Moon and Earth [km]
+moonMass = 7.34767309 * 10^22;  % Mass of the moon [kg]
+earthMass = 5.97219 * 10^24;    % Mass of the Earth [kg]
+moonVel = 1.023;                % Velocity of the moon relative to Earth [km/s]
+moonGravConst = 4.902 * 10^3;   % Gravitational constant of the moon [km^3 / s^2]
+moonAvgRadius = 1737.5;         % Average radius of the Moon [km]
+
+%% DELTA V1 (Launch from Earth to parking orbit)
+
 % Orbit Parameters
 
 alt = 275;                                % Parking orbit altitude range [km]
@@ -48,12 +61,6 @@ incDiff = finalInc - initInc;   % Inclination Difference [deg]
 deltaV2 = 2 * velOrbit * sind(abs(incDiff) / 2); 
 
 %% DELTA V3 (TLI burn to raise apogee to reach moon)
-% Planetary Parameters
-distCOM = 384400;               % Distance between the COMs of the Moon and Earth [km]
-moonMass = 7.34767309 * 10^22;  % Mass of the moon [kg]
-earthMass = 5.97219 * 10^24;    % Mass of the Earth [kg]
-moonVel = 1.023;                % Velocity of the moon relative to Earth [km/s]
-moonGravConst = 4.902 * 10^3;    % Gravitational constant of the moon [km^3 / s^2]
 
 % Before TLI Orbit Parameters
 injAngl = 0;             % Injection angle at perigee [deg]
@@ -133,8 +140,7 @@ deltaV4 = v_p - moonOrbitVel;
 r_p_new = r_p; %New desired perilune radius
 deltaV5 = moonOrbitVel - sqrt(2 * moonGravConst / r_p - moonGravConst / ((r_p + r_p_new) / 2)); %Vis Viva for new orbit subtracted from current velocity
 %% DELTA V6 (Landing delta v estimate)
-% Landing spot is at avg radius
-moonAvgRadius = 1737.5;
+
 % Phase 1 of landing
 Phase1Apolune = r_p;
 Phase1Perilune = moonAvgRadius;
@@ -148,7 +154,6 @@ Phase2FinalVelocity = .002;
 Phase2DeltaV = abs(Phase2FinalVelocity - Phase2Velocity);
 
 % Phase 3 of landing
-g0 = 9.81;
 g = 9.81/6;
 burntime = 60;
 Phase3DeltaV = burntime * g / 1000;
@@ -158,24 +163,25 @@ deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
 totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %% Mass Estimation %% —----------------------------------------------------------------------------
 %Current ISP and finert values represent nothing, left is last stage, right is launch
-Isp = [315.5 315.5 315.5 465.5 453.8 360]; %Specific Impulse, add more per stage/different ISP
-finert = [.23 .23 .23 .1 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
-%RD843 hydrazine for landing and capture, RL10 for kick, Vulcan Centaur for launch and LEO
+Isp = [315.5 465.5 465.5]; %Specific Impulse, add more per stage/different ISP
+finert = [.23 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
+%RD843 hydrazine for landing, RL10 for kick and capture, Vulcan Centaur for launch and LEO
 %Landing and capture stages based on lengthened AVUM, kick stage based on lengthened Centaur
-minitial(1:5) = [1000]; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
-dv = [deltaV6 deltaV5 deltaV4 deltaV3 deltaV2 deltaV1] * 1000; %Places delta V's into form more usable for loops
+stagecount = length(Isp);
+minitial(1:stagecount + 1) = 1000; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
+dv = [deltaV6 deltaV5 + deltaV4 deltaV3] * 1000; %Places delta V's into form more usable for loops
 LVmaxpay = 27200; %Launch Vehicle max payload (kg)
 whilecond = 0;
 
 while whilecond ~= 1
     %Loop generating mass estimates
-    if minitial(5) < LVmaxpay %Checks LEO payload mass is less than LV max mass to LEO
+    if minitial(stagecount + 1) < LVmaxpay %Checks LEO payload mass is less than LV max mass to LEO
         minitial(1) = minitial(1) + 1; %Adds 1kg to the final payload
     else
         whilecond = 1; %Loop conditional is now satisfied
         minitial(1) = minitial(1) - 1; %Subtracts 1kg to the final payload
     end
-    for I = 1:1:6 %I runs to max number of burns/stages
+    for I = 1:1:stagecount %I runs to max number of burns/stages
         mprop(I) = minitial(I) * (exp(dv(I)/(Isp(I) * g0)) - 1) * (1 - finert(I)) / (1-finert(I) * exp(dv(I)/(Isp(I) * g0))); %Estimates propellant mass
         minert(I) = finert(I)/(1-finert(I)) * mprop(I); %Estimates inert mass
         minitial(I+1) =  minert(I) + minitial(I) + mprop(I); %Adds the mass initial of this stage as the payload of the next
