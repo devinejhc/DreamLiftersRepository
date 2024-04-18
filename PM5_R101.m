@@ -188,15 +188,20 @@ while whilecond ~= 1
     end
     
 end
-%% Launch vehicle allowed GTO mass
-%Working backwards from GSO
-geostationaryRadius = 42164;
-geostationaryVelocity = sqrt(earthGravConst/geostationaryRadius);
-%GTO
-perigeeAltitude = 200; %this is based on ESA typical perigee altitude
-GTOSemiMajorAxis = (perigeeAltitude + geostationaryRadius + earthAvgRadius) / 2;
-GTOApogeeVelocity = sqrt(earthGravConst * (2/geostationaryRadius) - (1/GTOSemiMajorAxis));
-%Plane Change
-GTOPlaneChange = 2 * GTOApogeeVelocity * sind(27/2);
-%Delta V from GTO to GSO
-deltaVdifference = GTOPlaneChange + (geostationaryVelocity - GTOApogeeVelocity);
+%% Tank sizing
+CentaurTankSize = 69.8;  % Centaur tank size in cubic meters
+CentaurLength = 12.68 - 1.45; % Centaur tank length
+CentaurPropMass = 20830; % Centaur propellant mass in kg
+LEMTankSize = 1.906 * 4; % LEM descent stage tank size in cubic meters
+LEMPropMass = 8200; % LEM descent stage propellant mass in kg
+LEMPressuranceMass = 22;
+CentaurLengthPerPropMass = CentaurLength/CentaurPropMass;
+TransferStageTankLength = mprop(2) * CentaurLengthPerPropMass;
+PressurantPerPropMassHypergol = LEMPressuranceMass/LEMPropMass;
+LandingPressurantMass = mprop(1) * PressurantPerPropMassHypergol;
+HeliumSpecificVolume = 1/1.71;
+PressurantVolume = HeliumSpecificVolume * LandingPressurantMass;
+HypergolSpecificVolume = LEMTankSize / LEMPropMass;
+LandingStageTankVolume = HypergolSpecificVolume * mprop(1);
+
+
