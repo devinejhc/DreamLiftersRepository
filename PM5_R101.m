@@ -163,13 +163,13 @@ deltaV6 = Phase1DeltaV + Phase2DeltaV + Phase3DeltaV;
 totalDeltaV = deltaV1 + deltaV2 + deltaV3 + deltaV4 + deltaV5 + deltaV6;
 %% Mass Estimation %% —----------------------------------------------------------------------------
 %Current ISP and finert values represent nothing, left is last stage, right is launch
-Isp = [315.5 465.5 465.5]; %Specific Impulse, add more per stage/different ISP
-finert = [.23 .1 .1]; %Inert mass fraction of a propulsion system, add more per stage
+Isp = [315.5 465.5]; %Specific Impulse, add more per stage/different ISP
+finert = [.23 .1]; %Inert mass fraction of a propulsion system, add more per stage
 %RD843 hydrazine for landing, RL10 for kick and capture, Vulcan Centaur for launch and LEO
 %Landing and capture stages based on lengthened AVUM, kick stage based on lengthened Centaur
 stagecount = length(Isp);
 minitial(1:stagecount + 1) = 1000; %Payload mass in kg for the last stage, further generated masses is each subsequent stages payload
-dv = [deltaV6 deltaV5 + deltaV4 deltaV3] * 1000; %Places delta V's into form more usable for loops
+dv = [deltaV6 - Phase1DeltaV deltaV5 + deltaV4 + deltaV3 + Phase1DeltaV] * 1000; %Places delta V's into form more usable for loops
 LVmaxpay = 27200; %Launch Vehicle max payload (kg)
 whilecond = 0;
 
