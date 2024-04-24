@@ -202,6 +202,11 @@ LandingPressurantMass = mprop(1) * PressurantPerPropMassHypergol;
 HeliumSpecificVolume = 1/1.71;
 PressurantVolume = HeliumSpecificVolume * LandingPressurantMass;
 HypergolSpecificVolume = LEMTankSize / LEMPropMass;
-LandingStageTankVolume = HypergolSpecificVolume * mprop(1);
+LandingStageTankVolume = HypergolSpecificVolume * mprop(1); % in cubic meters
 
+%% TWR calcs
+engineThrust = 2452; % Thrust per landing engine, N
+descentMass = minitial(2);
+thrustRequired = 1.3 * descentMass * g;
+engineCount = ceil(thrustRequired / engineThrust);
 
